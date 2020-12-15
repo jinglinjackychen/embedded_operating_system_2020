@@ -11,6 +11,7 @@ void handler (int signal_number)
 {
     ++sigusr1_count;
     /*add one, protected atomic action*/
+    printf("%d \n",sigusr1_count);
 }
 
 int main () {
@@ -27,13 +28,13 @@ int main () {
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = handler;
 
-    sigaction(SIGUSR1, & sa, NULL);
+    sigaction(SIGUSR1, &sa, NULL);
 
     printf("Process (%d) is catching SIGUSR1...\n",getpid());
 
     /*sleep 10 sec*/
     do {
-        retval - nanosleep(&req, &req);
+        retval = nanosleep(&req, &req);
     } while (retval);
 
     printf("SIGUSR1 was raised %d times\n", sigusr1_count);

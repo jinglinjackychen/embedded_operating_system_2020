@@ -1,6 +1,3 @@
-/*
-* shm_server.c -- creates the string and shared memory .
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ipc.h>
@@ -66,8 +63,10 @@ void shm_create(int input_key)
 
 int main(int argc, char **argv)
 {
-	int key_number;
+	int key_number,guess;
 	key_number = atoi(argv[1]);
+	guess = atoi(argv[2]);
+
 	shm_create(key_number);
 	return 0;
 }

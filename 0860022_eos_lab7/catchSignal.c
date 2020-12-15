@@ -4,8 +4,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
-
 void handler(int signo, siginfo_t *info, void *context)
 {
     /*show the process ID sent signal*/
