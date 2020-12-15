@@ -9,6 +9,11 @@
 
 #define SHMSZ 27
 
+typedef struct {
+    int guess;
+    char result[8];
+}data;
+
 void timer_handler(int signum)
 {
     static int count = 0;
@@ -39,24 +44,25 @@ void timer_function(int pid)
     /* Do busy work */
     while (1);
 }
-void shm_client(int input_key)
+void shm_client(int input_key,int upper_bound)
 {
 	int shmid;
 	key_t key;
 	char *shm, *s;
+	data *sh_guess_number,*guess_number;
 
 	/* We need to get the segment named "5678" , created by the server */
 	key = input_key;
 
 	/* Locate the segment */
-	if((shmid = shmget(key, SHMSZ, 0666)) < 0)
+	if((shmid = shmget(key, 1, 0666)) < 0)
 	{
 		perror("shmget");
 		exit(1);
 	}
-	
+
 	/* Now we attach the segment to our data space */
-	if((shm = shmat(shmid, NULL, 0)) == (char *) -1)
+	if((sh_guess_number = shmat(shmid, NULL, 0)) == (data *) -1)
 	{
 		perror("shmat");
 		exit(1);
@@ -64,21 +70,21 @@ void shm_client(int input_key)
 	printf("Client attach the share memory created by server.  \n");
 
 	/* Now read what the server put in the memory */
-	printf("Client read characters from share memory...  \n");
-	for(s = shm; *s != '\0' ; s++)
-		putchar(*s);
-	putchar( '\n' );
+	printf("Client read int from share memory...  \n");
+	guess_number = sh_guess_number;
+	printf("%d",guess_number->guess);
+	putchar('\n');
 
 	/*
 	* Finally , change the first character of the segment to ’*’,
 	* indicating we have read the segment .
 	*/
-	printf("Client write ∗ to the share memory.  \n");
-	*shm = '*';
+	printf("Client write 100 to the share memory.  \n");
+	guess_number->guess = 100;
 
 	/* Detach the share memory segment */
 	printf(" Client detach the share memory.  \n");
-	shmdt(shm);
+	shmdt(guess_number);
 }
 
 int main(int argc, char **argv)
@@ -89,6 +95,6 @@ int main(int argc, char **argv)
     pid_number = atoi(argv[3]);
 
     //timer_function(pid_number);
-	shm_client(key_number);
+	shm_client(key_number,upper_bound);
     return 0;
 }

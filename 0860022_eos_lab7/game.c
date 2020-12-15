@@ -7,26 +7,31 @@
 
 #define SHMSZ 27
 
-void shm_create(int input_key)
+typedef struct {
+    int guess;
+    char result[8];
+}data;
+
+void shm_create(int input_key,int input_number)
 {
 	char c;
 	int shmid;
 	key_t key;
-	char *shm, *s;
+	data *sh_guess_number,*guess_number;
 	int retval;
 
 	/* We ’ll name our shared memory segment "5678" */
 	key = input_key;
 
 	/* Create the segment */
-	if((shmid = shmget(key, SHMSZ, IPC_CREAT | 0666)) < 0)
+	if((shmid = shmget(key, 1, IPC_CREAT | 0666)) < 0)
 	{
 		perror("shmget");
 		exit(1);
 	}
 
 	/* Now we attach the segment to our data space */
-	if((shm = shmat(shmid, NULL, 0)) == (char *) -1)
+	if((sh_guess_number = shmat(shmid, NULL, 0)) == (data *) -1)
 	{
 		perror("shmat");
 		exit(1);
@@ -34,11 +39,9 @@ void shm_create(int input_key)
 	printf("Server create and attach the share memory. \n");
 
 	/* Now put some things into the memory for the other process to read */
-	s = shm;
-	printf("Server write a~z to share memory. \n");
-	for(c = 'a' ; c <= 'z'; c++)
-		*s++ = c;
-	*s = '\0';
+	guess_number = sh_guess_number;
+	printf("Server write guess_number to share memory. \n");
+	guess_number->guess = input_number;
 
 	/*
 	* Finally , we wait until the other process changes the first
@@ -46,11 +49,11 @@ void shm_create(int input_key)
 	* what we put there .
 	*/
 	printf("Waiting other process read the share memory...  \n");
-	while (*shm != '*')
+	while (guess_number->guess != 100)
 		sleep(1);
-	printf("Server read ∗ from the share memory.  \n");
+	printf("Server read 100 from the share memory.  \n");
 	/* Detach the share memory segment */
-	shmdt(shm);
+	shmdt(sh_guess_number);
 	/* Destroy the share memory segment */
 	printf("Server destroy the share memory.  \n");
 	retval = shmctl(shmid, IPC_RMID, NULL);
@@ -67,6 +70,6 @@ int main(int argc, char **argv)
 	key_number = atoi(argv[1]);
 	guess = atoi(argv[2]);
 
-	shm_create(key_number);
+	shm_create(key_number,guess);
 	return 0;
 }
