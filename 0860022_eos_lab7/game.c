@@ -40,8 +40,11 @@ void shm_create(int input_key,int input_number)
 
 	/* Now put some things into the memory for the other process to read */
 	guess_number = sh_guess_number;
+	guess_number->guess = -1;
+	strcpy(guess_number->result,"init");
+	
 	printf("Server write guess_number to share memory. \n");
-	guess_number->guess = input_number;
+	//guess_number->guess = input_number;
 
 	/*
 	* Finally , we wait until the other process changes the first
@@ -49,9 +52,12 @@ void shm_create(int input_key,int input_number)
 	* what we put there .
 	*/
 	printf("Waiting other process read the share memory...  \n");
-	while (guess_number->guess != 100)
+	while (guess_number->guess != input_number)
+	{
+		strcpy(guess_number->result,"bingo");
 		sleep(1);
-	printf("Server read 100 from the share memory.  \n");
+	}
+	printf("Server read %d from the share memory.  \n",input_number);
 	/* Detach the share memory segment */
 	shmdt(sh_guess_number);
 	/* Destroy the share memory segment */

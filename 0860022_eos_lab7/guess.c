@@ -46,10 +46,12 @@ void timer_function(int pid)
 }
 void shm_client(int input_key,int upper_bound)
 {
-	int shmid;
+	int shmid,check;
 	key_t key;
 	char *shm, *s;
 	data *sh_guess_number,*guess_number;
+
+	check = upper_bound;
 
 	/* We need to get the segment named "5678" , created by the server */
 	key = input_key;
@@ -69,18 +71,24 @@ void shm_client(int input_key,int upper_bound)
 	}
 	printf("Client attach the share memory created by server.  \n");
 
-	/* Now read what the server put in the memory */
+	/* Now read what the server put in theguess_number memory */
 	printf("Client read int from share memory...  \n");
 	guess_number = sh_guess_number;
-	printf("%d",guess_number->guess);
-	putchar('\n');
+	//printf("%d",guess_number->guess);
+	//putchar('\n');
 
 	/*
 	* Finally , change the first character of the segment to ’*’,
 	* indicating we have read the segment .
 	*/
 	printf("Client write 100 to the share memory.  \n");
-	guess_number->guess = 100;
+	//guess_number->guess = 100;
+
+	while(guess_number->result != "bingo")
+	{
+		check /= 2;
+		guess_number->guess = check;
+	}
 
 	/* Detach the share memory segment */
 	printf(" Client detach the share memory.  \n");
