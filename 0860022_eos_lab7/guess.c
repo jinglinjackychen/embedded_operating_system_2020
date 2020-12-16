@@ -57,6 +57,7 @@ void shm_client(int input_key, int upper_bound)
 	char bingo[8] = "bingo";
 	char smaller[8] = "smaller";
 	char bigger[8] = "bigger";
+	char init[8] = "init";
 
 	/* We need to get the segment named "5678" , created by the server */
 	key = input_key;
@@ -74,43 +75,46 @@ void shm_client(int input_key, int upper_bound)
 		perror("shmat");
 		exit(1);
 	}
-	//printf("Client attach the share memory created by server. \n");
+	// Client attach the share memory created by server
 
 	/* Now read what the server put in theguess_number memory */
-	//printf("Client read data from share memory...  \n");
+	// Client read data from share memory...
 	guess_number = sh_guess_number;
-	//printf("%d",guess_number->guess);
-	//putchar('\n');
 
 	/*
 	* Finally , change the first character of the segment to ’*’,
 	* indicating we have read the segment .
 	*/
-	//printf("Client write data to the share memory. \n");
+	// Client write data to the share memory.
 
-	while (strcmp(guess_number->result,bingo) != 0)
+	while (strcmp(guess_number->result, bingo) != 0)
 	{
 		check = (low + high) / 2;
 		guess_number->guess = check;
-		printf("[game] Guess: %d\n",guess_number->guess);
 
-		if(strcmp(guess_number->result,bingo) == 0)
+		if (strcmp(guess_number->result, bingo) == 0)
 		{
+			printf("[game] Guess: %d\n", guess_number->guess);
+
 			break;
 		}
-		else if(strcmp(guess_number->result,smaller) == 0)
+		else if (strcmp(guess_number->result, smaller) == 0)
 		{
+			printf("[game] Guess: %d\n", guess_number->guess);
+
 			high = guess_number->guess;
 		}
-		else if(strcmp(guess_number->result,bigger) == 0)
+		else if (strcmp(guess_number->result, bigger) == 0)
 		{
+			printf("[game] Guess: %d\n", guess_number->guess);
+
 			low = guess_number->guess;
 		}
 		sleep(1);
 	}
 
 	/* Detach the share memory segment */
-	//printf("Client detach the share memory. \n");
+	// Client detach the share memory.
 	shmdt(guess_number);
 }
 

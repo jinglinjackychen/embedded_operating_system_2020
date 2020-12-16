@@ -36,21 +36,21 @@ void shm_create(int input_key,int input_number)
 		perror("shmat");
 		exit(1);
 	}
-	//printf("Server create and attach the share memory. \n");
+	// Server create and attach the share memory.
 
 	/* Now put some things into the memory for the other process to read */
 	guess_number = sh_guess_number;
 	guess_number->guess = -1;
 	strcpy(guess_number->result,"init");
 	
-	//printf("Server write guess_number to share memory. \n");
+	// Server write guess_number to share memory.
 
 	/*
 	* Finally , we wait until the other process changes the first
 	* character of our memory to ’*’, indicating that it has read
 	* what we put there .
 	*/
-	//printf("Waiting other process read the share memory...  \n");
+	// Waiting other process read the share memory...
 	while (guess_number->guess != input_number)
 	{
 		if(guess_number->guess == -1)
@@ -73,11 +73,11 @@ void shm_create(int input_key,int input_number)
 	strcpy(guess_number->result,"bingo");
 	printf("[game] Guess %d, %s \n",guess_number->guess,guess_number->result);
 
-	//printf("Server read %d from the share memory.  \n",input_number);
+	// Server read data from the share memory.
 	/* Detach the share memory segment */
 	shmdt(sh_guess_number);
 	/* Destroy the share memory segment */
-	//printf("Server destroy the share memory.  \n");
+	// Server destroy the share memory.
 	retval = shmctl(shmid, IPC_RMID, NULL);
 	if(retval < 0)
 	{
