@@ -39,7 +39,7 @@ void *th(void *arg)
   while (scanf("%s", msg_buf))
   {
     printf("%s\n", msg_buf);
-    if (strcmp(msg_buf, "end") == 0)
+    if (strcmp(msg_buf, "write") == 0)
     {
       printf("called\n");
       pl->logStatus("result.txt");

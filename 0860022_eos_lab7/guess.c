@@ -48,7 +48,6 @@ void shm_client(int input_key, int upper_bound,int pid_number)
 {
 	int shmid, check;
 	key_t key;
-	char *shm, *s;
 	data *sh_guess_number, *guess_number;
 
 	int low = 1, high = upper_bound;
@@ -82,6 +81,7 @@ void shm_client(int input_key, int upper_bound,int pid_number)
 	* Finally , change the first character of the segment to ’*’,
 	* indicating we have read the segment .
 	*/
+
 	// Client write data to the share memory.
 
 	check = (low + high) / 2;

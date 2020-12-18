@@ -75,6 +75,7 @@ void shm_create(int input_key)
 	* character of our memory to ’*’, indicating that it has read
 	* what we put there .
 	*/
+
 	// Waiting other process read the share memory...
 
 	while (stop)
