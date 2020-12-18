@@ -7,8 +7,6 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 
-#define SHMSZ 27
-
 typedef struct
 {
 	int guess;
@@ -46,7 +44,7 @@ void timer_function(int pid)
 	while (1)
 		;
 }
-void shm_client(int input_key, int upper_bound)
+void shm_client(int input_key, int upper_bound,int pid_number)
 {
 	int shmid, check;
 	key_t key;
@@ -57,7 +55,6 @@ void shm_client(int input_key, int upper_bound)
 	char bingo[8] = "bingo";
 	char smaller[8] = "smaller";
 	char bigger[8] = "bigger";
-	char init[8] = "init";
 
 	/* We need to get the segment named "5678" , created by the server */
 	key = input_key;
@@ -87,29 +84,29 @@ void shm_client(int input_key, int upper_bound)
 	*/
 	// Client write data to the share memory.
 
+	check = (low + high) / 2;
+	guess_number->guess = check;
+
 	while (strcmp(guess_number->result, bingo) != 0)
 	{
-		check = (low + high) / 2;
-		guess_number->guess = check;
-
 		if (strcmp(guess_number->result, bingo) == 0)
 		{
-			printf("[game] Guess: %d\n", guess_number->guess);
-
+			kill(pid_number, SIGUSR1);
 			break;
 		}
 		else if (strcmp(guess_number->result, smaller) == 0)
 		{
-			printf("[game] Guess: %d\n", guess_number->guess);
-
-			high = guess_number->guess;
+			kill(pid_number, SIGUSR1);
+			high = guess_number->guess - 1;
 		}
 		else if (strcmp(guess_number->result, bigger) == 0)
 		{
-			printf("[game] Guess: %d\n", guess_number->guess);
-
-			low = guess_number->guess;
+			kill(pid_number, SIGUSR1);
+			low = guess_number->guess + 1;
 		}
+		check = (low + high) / 2;
+		guess_number->guess = check;
+		printf("[game] Guess: %d\n", guess_number->guess);
 		sleep(1);
 	}
 
@@ -126,6 +123,7 @@ int main(int argc, char **argv)
 	pid_number = atoi(argv[3]);
 
 	//timer_function(pid_number);
-	shm_client(key_number, upper_bound);
+	kill(pid_number, SIGUSR1);
+	shm_client(key_number, upper_bound, pid_number);
 	return 0;
 }
